@@ -36,10 +36,17 @@ then
       sed -i -r \
           -e "s/${CPAN_NAME}-[[:digit:]]\.[[:digit:]]+\.tar\.gz/${CPAN_NAME}-${VERSION}.tar.gz/" \
           ${OBS_NAME}.spec ; \
+      echo "Running local source services" ; \
       osc service dr ; \
+      echo "Adding new tarball" ; \
       osc add $CPAN_NAME-*.tar.gz ; \
+      echo "Updating changes file" ; \
       osc vc -m "updated to ${VERSION}\n   see /usr/share/doc/packages/$OBS_NAME/Changes" ; \
-      osc -A https://api.opensuse.org/ commit -m $VERSION ; \
+      echo "Committing" ; \
+      osc -A https://api.opensuse.org/ commit -v -m $VERSION ; \
+      echo "Waiting 10 seconds" ; \
+      sleep 10 ; \
+      echo "Submitting" ; \
       osc -A https://api.opensuse.org/ sr -m $VERSION \
     )
 fi
