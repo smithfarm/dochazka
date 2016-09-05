@@ -1,8 +1,11 @@
 dochazka
 ========
 
-This repo contains the release automation scripts used by all Perl modules in
-the Dochazka project.
+For Dochazka documentation, see
+``https://metacpan.org/pod/App::Dochazka::REST#DOCUMENTATION``.
+
+This repo contains release automation scripts and other boilerplate used by all
+Perl modules in the Dochazka project. It does not contain any Dochazka source code.
 
 This repo also serves as a central place for filing issues against the Dochazka
 repos:
