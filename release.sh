@@ -21,18 +21,28 @@ perl Build.PL
 
 if [ 'x'$obs'x' = 'xyx' ]
 then
-    ( cd $OBS_DIR ; \
-      osc -A https://api.opensuse.org/ up ; \
+    ( \
+      echo "Removing old checkout" ; \
+      rm -rf $OBS_DIR ; \
+      cd $HOME/obs ; \
+      echo "Branching $OBS_PROJECT/$OBS_NAME" ; \
+      osc -A https://api.opensuse.org/ branch $OBS_PROJECT/$OBS_NAME ; \
+      echo "Checking out branch" ; \
+      osc co home:smithfarm:branches:$OBS_PROJECT/$OBS_NAME ; \
+      cd home:smithfarm:branches:$OBS_PROJECT/$OBS_NAME ; \
+      echo "Removing old tarball(s)" ; \
       osc rm -f $CPAN_NAME-*.tar.gz \
     )
 fi
 
+echo "Copying new tarball into $OBS_DIR"
 cp $CPAN_NAME-*.tar.gz $OBS_DIR
 ./Build distclean
 
 if [ 'x'$obs'x' = 'xyx' ]
 then
     ( cd $OBS_DIR ; \
+      echo "Adjusting version number in spec file" ; \
       sed -i -r \
           -e "s/${CPAN_NAME}-[[:digit:]]\.[[:digit:]]+\.tar\.gz/${CPAN_NAME}-${VERSION}.tar.gz/" \
           ${OBS_NAME}.spec ; \
@@ -43,11 +53,11 @@ then
       echo "Updating changes file" ; \
       osc vc -m "updated to ${VERSION}\n   see /usr/share/doc/packages/$OBS_NAME/Changes" ; \
       echo "Committing" ; \
-      osc -A https://api.opensuse.org/ commit -v -m $VERSION ; \
+      osc -A https://api.opensuse.org/ commit -v -m $VERSION --noservice ; \
       echo "Waiting 10 seconds" ; \
       sleep 10 ; \
       echo "Submitting" ; \
-      osc -A https://api.opensuse.org/ sr -m $VERSION \
+      osc -A https://api.opensuse.org/ sr -m $VERSION --no-cleanup \
     )
 fi
 
