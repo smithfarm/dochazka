@@ -42,12 +42,8 @@ cp $CPAN_NAME-*.tar.gz $OBS_DIR
 if [ 'x'$obs'x' = 'xyx' ]
 then
     ( cd $OBS_DIR ; \
-      echo "Adjusting version number in spec file" ; \
-      sed -i -r \
-          -e "s/${CPAN_NAME}-[[:digit:]]\.[[:digit:]]+\.tar\.gz/${CPAN_NAME}-${VERSION}.tar.gz/" \
-          ${OBS_NAME}.spec ; \
-      echo "Running local source services" ; \
-      osc service dr ; \
+      echo "Running cpanspec" ; \
+      cpanspec -f *.tar.gz ; \
       echo "Adding new tarball" ; \
       osc add $CPAN_NAME-*.tar.gz ; \
       echo "Updating changes file" ; \
