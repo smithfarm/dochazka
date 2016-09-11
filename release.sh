@@ -46,8 +46,6 @@ then
       cpanspec -f *.tar.gz ; \
       echo "Adding new tarball" ; \
       osc add $CPAN_NAME-*.tar.gz ; \
-      echo "Updating changes file" ; \
-      osc vc -m "updated to ${VERSION}\n   see /usr/share/doc/packages/$OBS_NAME/Changes" ; \
       echo "Committing" ; \
       osc -A https://api.opensuse.org/ commit -v -m $VERSION --noservice ; \
       echo "Waiting 10 seconds" ; \
