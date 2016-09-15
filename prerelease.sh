@@ -16,7 +16,12 @@ perl Build.PL
 perl-reversion | tail -n1
 VERSION=$(grep -P 'Version \d\.*\d+' $(cat VERSION_MODULE) | cut -d' ' -f2)
 echo "$VERSION $(date +'%Y-%m-%d %H:%M %Z')" >>Changes
-git --no-pager log $(git describe --tags --abbrev=0)..HEAD --oneline --no-color --reverse >>Changes
+git --no-pager log \
+    --no-merges \
+    --oneline \
+    --no-color \
+    --reverse \
+    $(git describe --tags --abbrev=0)..HEAD >>Changes
 echo >>Changes
 vi Changes
 git commit -as -m $VERSION
