@@ -5,11 +5,20 @@
 # Bumps version number, commits all outstanding modifications,
 # adds a git tag and appends draft Changes file entry
 #
+
+# sanity checks
 if [ ! -e VERSION_MODULE ]
 then
     echo "Must be run in git checkout"
     exit 1
 fi
+HEAD=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$HEAD" != "master" ]]
+then
+    echo "Must be on master branch"
+    exit 1
+fi
+
 perl-reversion -bump
 perl Build.PL
 ./Build distmeta
