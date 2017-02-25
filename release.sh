@@ -63,4 +63,4 @@ then
     )
 fi
 
-( cd $OBS_DIR ; cpan-upload -u SMITHFARM $CPAN_NAME-*.tar.gz )
+( cd $OBS_DIR ; cpan-upload -u SMITHFARM $CPAN_NAME-$VERSION.tar.gz )
