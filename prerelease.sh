@@ -35,3 +35,4 @@ echo >>Changes
 vi Changes
 git commit -as -m $VERSION
 git tag -m $VERSION $VERSION
+echo "Done. Now git push --follow-tags and, possibly, release.sh"
