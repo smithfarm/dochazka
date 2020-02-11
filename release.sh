@@ -63,7 +63,7 @@ if [ "$OBS" ] ; then
     set -ex
     pushd "$HOME/obs"
     rm -rf $OBS_DIR ; \
-    osc -A https://api.opensuse.org/ branch $OBS_PROJECT/$OBS_NAME
+    osc -A https://api.opensuse.org/ branch $OBS_PROJECT/$OBS_NAME 2>/dev/null || true
     osc -A https://api.opensuse.org/ co $OBS_DIR
     pushd $OBS_DIR
     osc rm -f $CPAN_NAME-*.tar.gz
