@@ -1,66 +1,81 @@
 #!/bin/bash
 # generic release script
 # meant to be run from the distro directory
+SCRIPTNAME=$(basename ${0})
+
+function usage {
+    echo "$SCRIPTNAME - script for cutting Dochazka releases"
+    echo
+    echo "Usage:"
+    echo "  $SCRIPTNAME [-h,--help] [--obs]"
+    echo
+    echo "Options:"
+    echo "    --help         Display this usage message"
+    echo "    --obs          Update OBS"
+    echo
+    exit 1
+}
 
 # sanity checks
-if [ ! -e VERSION_MODULE ]
-then
-    echo "Must be run in git checkout"
+if [ ! -e VERSION_MODULE ] ; then
+    echo "VERSION_MODULE file not found -- are you in a local git clone?"
     exit 1
 fi
 HEAD=$(git rev-parse --abbrev-ref HEAD)
-if [[ "$HEAD" != "master" ]]
-then
+if [ "$HEAD" = "master" ] ; then
+    true
+else
     echo "Must be on master branch"
     exit 1
 fi
 
-echo -n "Update OBS? (y/N) "
-read obs
+set -e
+TEMP=$(getopt -o h --long "help,obs" -n 'release.sh' -- "$@")
+set +e
+eval set -- "$TEMP"
+
+OBS=""
+while true ; do
+    case "$1" in
+        --obs) OBS="$1" ; shift ;;
+        --) shift ; break ;;
+        *) echo "Internal error" ; exit 1 ;;
+    esac
+done
 
 CPAN_NAME=$(cat CPAN_NAME)
-OBS_NAME="perl-$CPAN_NAME"
-OBS_PROJECT=$(cat OBS_PROJECT)
-OBS_DIR="$HOME/obs/home:smithfarm:branches:$OBS_PROJECT/$OBS_NAME/"
 VERSION=$(grep -P 'Version \d\.*\d+' $(cat VERSION_MODULE) | cut -d' ' -f2)
 perl Build.PL
 ./Build distmeta
 ./Build dist
+TARBALL_DIR=$(pwd)
 
-if [ 'x'$obs'x' = 'xyx' ]
-then
-    ( \
-      echo "Removing old checkout" ; \
-      rm -rf $OBS_DIR ; \
-      cd $HOME/obs ; \
-      echo "Branching $OBS_PROJECT/$OBS_NAME" ; \
-      osc -A https://api.opensuse.org/ branch $OBS_PROJECT/$OBS_NAME ; \
-      echo "Checking out branch" ; \
-      osc co home:smithfarm:branches:$OBS_PROJECT/$OBS_NAME ; \
-      cd home:smithfarm:branches:$OBS_PROJECT/$OBS_NAME ; \
-      echo "Removing old tarball(s)" ; \
-      osc rm -f $CPAN_NAME-*.tar.gz \
-    )
+if [ "$OBS" ] ; then
+    OBS_NAME="perl-$CPAN_NAME"
+    OBS_PROJECT=$(cat OBS_PROJECT)
+    OBS_DIR="home:smithfarm:branches:$OBS_PROJECT/$OBS_NAME/"
+    if [ -d "$HOME/obs" ] ; then
+        true
+    else
+        echo "No ~/obs directory: creating one"
+        mkdir -p "$HOME/obs"
+    fi
+    set -ex
+    pushd "$HOME/obs"
+    rm -rf $OBS_DIR ; \
+    osc -A https://api.opensuse.org/ branch $OBS_PROJECT/$OBS_NAME
+    osc -A https://api.opensuse.org/ co $OBS_DIR
+    pushd $OBS_DIR
+    osc rm -f $CPAN_NAME-*.tar.gz
+    cp $TARBALL_DIR/$CPAN_NAME-*.tar.gz .
+    cpanspec -f *.tar.gz
+    osc add $CPAN_NAME-*.tar.gz
+    osc -A https://api.opensuse.org/ commit -v -m $VERSION --noservice
+    sleep 10
+    osc -A https://api.opensuse.org/ sr -m $VERSION --no-cleanup
+    popd
+    popd
 fi
 
-echo "Copying new tarball into $OBS_DIR"
-cp $CPAN_NAME-*.tar.gz $OBS_DIR
+cpan-upload -u SMITHFARM $CPAN_NAME-$VERSION.tar.gz
 ./Build distclean
-
-if [ 'x'$obs'x' = 'xyx' ]
-then
-    ( cd $OBS_DIR ; \
-      echo "Running cpanspec" ; \
-      cpanspec -f *.tar.gz ; \
-      echo "Adding new tarball" ; \
-      osc add $CPAN_NAME-*.tar.gz ; \
-      echo "Committing" ; \
-      osc -A https://api.opensuse.org/ commit -v -m $VERSION --noservice ; \
-      echo "Waiting 10 seconds" ; \
-      sleep 10 ; \
-      echo "Submitting" ; \
-      osc -A https://api.opensuse.org/ sr -m $VERSION --no-cleanup \
-    )
-fi
-
-( cd $OBS_DIR ; cpan-upload -u SMITHFARM $CPAN_NAME-$VERSION.tar.gz )

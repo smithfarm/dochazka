@@ -35,4 +35,10 @@ echo >>Changes
 vi Changes
 git commit -as -m $VERSION
 git tag -m $VERSION $VERSION
-echo "Done. Now git push --follow-tags and, possibly, release.sh"
+
+echo -n "Run \"git push --follow-tags\" now? (Y/n) "
+read a
+if [ -z "$a" -o "$a" = "y" -o "$a" = "Y" ] ; then
+    git push --follow-tags
+    echo "Done. Now, possibly, \"release.sh\" or \"release.sh --obs\""
+fi
