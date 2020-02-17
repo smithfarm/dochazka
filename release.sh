@@ -80,5 +80,8 @@ if [ "$OBS" ] ; then
     popd
 fi
 
-cpan-upload -u SMITHFARM $CPAN_NAME-$VERSION.tar.gz
+if [ "$CPAN" ] ; then
+    cpan-upload -u SMITHFARM $CPAN_NAME-$VERSION.tar.gz
+fi
+
 ./Build distclean
