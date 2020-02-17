@@ -40,5 +40,5 @@ echo -n "Run \"git push --follow-tags\" now? (Y/n) "
 read a
 if [ -z "$a" -o "$a" = "y" -o "$a" = "Y" ] ; then
     git push --follow-tags
-    echo "Done. Now, possibly, \"release.sh\" or \"release.sh --obs\""
+    echo "Done. Now, possibly, \"release.sh --cpan\" or \"release.sh --cpan --obs\""
 fi

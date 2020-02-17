@@ -11,7 +11,7 @@ function usage {
     echo
     echo "Options:"
     echo "    --help         Display this usage message"
-    echo "    --no-cpan      Do *not* update CPAN"
+    echo "    --cpan         Upload to CPAN"
     echo "    --obs          Update OBS"
     echo
     exit 1
@@ -31,15 +31,15 @@ else
 fi
 
 set -e
-TEMP=$(getopt -o h --long "help,no-cpan,obs" -n 'release.sh' -- "$@")
+TEMP=$(getopt -o h --long "help,cpan,obs" -n 'release.sh' -- "$@")
 set +e
 eval set -- "$TEMP"
 
-CPAN="--cpan"
+CPAN=""
 OBS=""
 while true ; do
     case "$1" in
-        --no-cpan) CPAN="" ; shift ;;
+        --cpan) CPAN="$1" ; shift ;;
         --obs) OBS="$1" ; shift ;;
         --) shift ; break ;;
         *) echo "Internal error" ; exit 1 ;;
