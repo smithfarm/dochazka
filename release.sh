@@ -7,10 +7,11 @@ function usage {
     echo "$SCRIPTNAME - script for cutting Dochazka releases"
     echo
     echo "Usage:"
-    echo "  $SCRIPTNAME [-h,--help] [--obs]"
+    echo "  $SCRIPTNAME [-h,--help] [--no-cpan] [--obs]"
     echo
     echo "Options:"
     echo "    --help         Display this usage message"
+    echo "    --no-cpan      Do *not* update CPAN"
     echo "    --obs          Update OBS"
     echo
     exit 1
@@ -30,13 +31,15 @@ else
 fi
 
 set -e
-TEMP=$(getopt -o h --long "help,obs" -n 'release.sh' -- "$@")
+TEMP=$(getopt -o h --long "help,no-cpan,obs" -n 'release.sh' -- "$@")
 set +e
 eval set -- "$TEMP"
 
+CPAN="--cpan"
 OBS=""
 while true ; do
     case "$1" in
+        --no-cpan) CPAN="" ; shift ;;
         --obs) OBS="$1" ; shift ;;
         --) shift ; break ;;
         *) echo "Internal error" ; exit 1 ;;
