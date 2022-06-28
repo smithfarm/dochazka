@@ -66,16 +66,16 @@ if [ "$OBS" ] ; then
     set -ex
     pushd "$HOME/obs"
     rm -rf $OBS_DIR ; \
-    osc -A https://api.opensuse.org/ branch $OBS_PROJECT/$OBS_NAME 2>/dev/null || true
-    osc -A https://api.opensuse.org/ co $OBS_DIR
+    osc -A https://api.opensuse.org branch $OBS_PROJECT/$OBS_NAME 2>/dev/null || true
+    osc -A https://api.opensuse.org co $OBS_DIR
     pushd $OBS_DIR
     osc rm -f $CPAN_NAME-*.tar.gz
     cp $TARBALL_DIR/$CPAN_NAME-*.tar.gz .
     cpanspec -f *.tar.gz
     osc add $CPAN_NAME-*.tar.gz
-    osc -A https://api.opensuse.org/ commit -v -m $VERSION --noservice
+    osc -A https://api.opensuse.org commit -v -m $VERSION --noservice
     sleep 10
-    osc -A https://api.opensuse.org/ sr -m $VERSION --no-cleanup
+    osc -A https://api.opensuse.org sr -m $VERSION --no-cleanup
     popd
     popd
 fi
