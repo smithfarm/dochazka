@@ -15,6 +15,16 @@ repos:
 * https://github.com/smithfarm/dochazka-cli
 * https://github.com/smithfarm/dochazka-www
 
+Running Dochazka from source
+============================
+
+Before Dochazka can be run from source, dependencies (both build and runtime)
+must be satisfied. Common dependencies can be installed by running the
+:code:`bootstrap.sh` script provided in this git repo. Other Dochazka repos
+contain their own :code:`bootstrap.sh` scripts for installing dependencies
+specific to those projects.
+
+
 Release management
 ==================
 
