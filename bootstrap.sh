@@ -7,6 +7,7 @@ sudo zypper --non-interactive install \
     perl-Params-Validate \
     perl-File-ShareDir-Install \
     perl-Test-Deep \
+    perl-Test-Fatal \
     perl-Test-Output \
     perl-Test-Warnings \
     perl-Perl-Version \
